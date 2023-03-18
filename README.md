@@ -5,8 +5,8 @@ The objective of this project is to show that you have acquired programming logi
 The programming language you are about to use is C. You will not be asked to create a project from scratch, instead you will have to add features or fix the code of a given application.
 
 ##  Steps
-+   [ ] Login/Register
-+   [ ] Create a new account
++   [ ] Login
++   [ ] Register/Create a new account
 +   [ ] Check the details of existing accounts
 +   [ ] Update information of existing accounts
 +   [ ] Remove existing accounts

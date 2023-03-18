@@ -1,0 +1,10 @@
+_atm-management-system/Makefile
+_atm-management-system/README.md
+_atm-management-system/data/records.txt
+_atm-management-system/data/users.txt
+_atm-management-system/src/auth.c
+_atm-management-system/src/header.h
+_atm-management-system/src/main.c
+_atm-management-system/src/system.c
+.vscode/settings.json
+src/*.o
