@@ -9,8 +9,8 @@ The programming language you are about to use is C. You will not be asked to cre
 +   [x] Register
 +   [x] Create a new account
 +   [x] Check the details of existing accounts
++   [x] Remove existing accounts
 +   [ ] Update information of existing accounts
-+   [ ] Remove existing accounts
 +   [ ] Check list of owned accounts
 +   [ ] Make transactions
 

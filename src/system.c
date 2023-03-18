@@ -157,7 +157,61 @@ Again:
     success(u);
 }
 
-void createNewAcc(struct User u) {
+void RemoveAccount(struct User u) {
+    int AccNum;
+
+    printf("\n\nEnter the account number you want to delete: ");
+    scanf("%d", &AccNum);
+
+    FILE * f;
+    if ((f = fopen(RECORDS, "r+")) == NULL)  {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    struct Record r;
+    char userName[100];
+    int ok = 0;
+
+    FILE * new;
+    if ((new = fopen("./data/temp.txt", "w+")) == NULL)  {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    while(getAccountFromFile(f, userName, &r)) {
+        if ((strcmp(userName, u.name) == 0) && AccNum == r.accountNbr) {
+            ok = 1;
+            system("clear");
+            printf("_____________________\n");
+            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+                   r.accountNbr,
+                   r.deposit.day,
+                   r.deposit.month,
+                   r.deposit.year,
+                   r.country,
+                   r.phone,
+                   r.amount,
+                   r.accountType);
+        } else {
+             saveAccountToFile(new, &u, &r);
+        }
+    }
+    if (ok == 0) {
+        printf("Invalid operation\n\n");
+        stayOrReturn(1, mainMenu, u);
+    }
+
+    remove("./data/records.txt");
+    rename("./data/temp.txt", "./data/records.txt");
+
+    fclose(f); 
+    fclose(new);
+
+    success(u);
+}
+
+void createNewAccount(struct User u) {
     struct Record r;
     struct Record cr;
     char userName[50];
