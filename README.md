@@ -6,8 +6,9 @@ The programming language you are about to use is C. You will not be asked to cre
 
 ##  Steps
 +   [x] Login
-+   [x] Register/Create a new account
-+   [ ] Check the details of existing accounts
++   [x] Register
++   [x] Create a new account
++   [x] Check the details of existing accounts
 +   [ ] Update information of existing accounts
 +   [ ] Remove existing accounts
 +   [ ] Check list of owned accounts

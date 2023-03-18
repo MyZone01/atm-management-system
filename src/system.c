@@ -2,12 +2,11 @@
 
 const char *RECORDS = "./data/records.txt";
 
-int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
-{
+int getAccountFromFile(FILE *ptr, char name[50], struct Record *r) {
     return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
                   &r->id,
-		  &r->userId,
-		  name,
+                  &r->userId,
+                  name,
                   &r->accountNbr,
                   &r->deposit.month,
                   &r->deposit.day,
@@ -18,12 +17,11 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
                   r->accountType) != EOF;
 }
 
-void saveAccountToFile(FILE *ptr, struct User *u, struct Record *r)
-{
+void saveAccountToFile(FILE *ptr, struct User *u, struct Record *r) {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
             r->id,
-	    u->id,
-	    u->name,
+            u->id,
+            u->name,
             r->accountNbr,
             r->deposit.month,
             r->deposit.day,
@@ -34,11 +32,9 @@ void saveAccountToFile(FILE *ptr, struct User *u, struct Record *r)
             r->accountType);
 }
 
-void stayOrReturn(int notGood, void f(struct User u), struct User u)
-{
+void stayOrReturn(int notGood, void f(struct User u), struct User u) {
     int option;
-    if (notGood == 0)
-    {
+    if (notGood == 0) {
         system("clear");
         printf("\n✖ Record not found!!\n");
     invalid:
@@ -50,54 +46,118 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
             mainMenu(u);
         else if (option == 2)
             exit(0);
-        else
-        {
+        else {
             printf("Insert a valid operation!\n");
             goto invalid;
         }
-    }
-    else
-    {
+    } else {
         printf("\nEnter 1 to go to the main menu and 0 to exit:");
         scanf("%d", &option);
     }
-    if (option == 1)
-    {
+    if (option == 1) {
         system("clear");
         mainMenu(u);
-    }
-    else
-    {
+    } else {
         system("clear");
         exit(1);
     }
 }
 
-void success(struct User u)
-{
+void success(struct User u) {
     int option;
     printf("\n✅ Success!\n\n");
 invalid:
     printf("Enter 1 to go to the main menu and 0 to exit!\n");
     scanf("%d", &option);
     system("clear");
-    if (option == 1)
-    {
+    if (option == 1) {
         mainMenu(u);
-    }
-    else if (option == 0)
-    {
+    } else if (option == 0) {
         exit(1);
-    }
-    else
-    {
+    } else {
         printf("Insert a valid operation!\n");
         goto invalid;
     }
 }
 
-void createNewAcc(struct User u)
-{
+void CheckDetailsAccount(struct User u) {
+    int accountNum, date, d, m, y;
+    char userName[100], accountType[100];
+    struct Record r;
+    float InterestRate = 1.0;
+    int ok = 0;
+
+Again:
+    printf("Enter the account number: ");
+    scanf("%d", &accountNum);
+
+    system("clear");
+
+    FILE *f = fopen(RECORDS, "r");
+
+    if ((f = fopen(RECORDS, "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+    while (getAccountFromFile(f, userName, &r)) {
+        if (strcmp(userName, u.name) == 0 && accountNum == r.accountNbr) {
+            ok++;
+            printf("_____________________\n");
+            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n", r.accountNbr, r.deposit.day, r.deposit.month, r.deposit.year, r.country, r.phone, r.amount, r.accountType);
+            if (strcmp(r.accountType, "saving") == 0) {
+                InterestRate = 0.07;
+                strcpy(accountType, "saving");
+                date = r.deposit.day;
+            } else {
+                if (strcmp(r.accountType, "current") == 0) {
+                    InterestRate = 0.0;
+                    strcpy(accountType, "current");
+                }
+                if (strcmp(r.accountType, "fixed01") == 0) {
+                    InterestRate = 0.04;
+                    strcpy(accountType, "fixed01");
+                }
+                if (strcmp(r.accountType, "fixed02") == 0) {
+                    InterestRate = 0.05;
+                    strcpy(accountType, "fixed02");
+                }
+                if (strcmp(r.accountType, "fixed03") == 0) {
+                    InterestRate = 0.08;
+                    strcpy(accountType, "fixed03");
+                }
+                d = r.deposit.day;
+                m = r.deposit.month;
+                y = r.deposit.year;
+            }
+        }
+    }
+    if (ok == 0) {
+        printf("❌ Error Invalid operation\n\n");
+        stayOrReturn(1, mainMenu, u);
+        goto Again;
+    }
+
+    if (InterestRate == 0.0) {
+        printf("\n\nYou will not get interests because the account is of type current");
+    } else {
+        if (strcmp(accountType, "saving") == 0) {
+            printf("\n\nYou will get $%f as interest on day %d of every month\n", (r.amount * InterestRate) / 12, date);
+        } else {
+            if (strcmp(accountType, "fixed01") == 0) {
+                printf("\n\nYou will get $%f as interest on %d/%d/%d", (r.amount * InterestRate), d, m, y + 1);
+            }
+            if (strcmp(accountType, "fixed02") == 0) {
+                printf("\n\nYou will get $%f as interest on %d/%d/%d", (r.amount * InterestRate) * 2, d, m, y + 2);
+            }
+            if (strcmp(accountType, "fixed03") == 0) {
+                printf("\n\nYou will get $%f as interest on %d/%d/%d", (r.amount * InterestRate) * 3, d, m, y + 3);
+            }
+        }
+    }
+    success(u);
+}
+
+void createNewAcc(struct User u) {
     struct Record r;
     struct Record cr;
     char userName[50];
@@ -112,10 +172,8 @@ noAccount:
     printf("\nEnter the account number:");
     scanf("%d", &r.accountNbr);
 
-    while (getAccountFromFile(pf, userName, &cr))
-    {
-        if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
-        {
+    while (getAccountFromFile(pf, userName, &cr)) {
+        if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr) {
             printf("❌Error This Account already exists for this user\n\n");
             goto noAccount;
         }
@@ -135,8 +193,7 @@ noAccount:
     success(u);
 }
 
-void checkAllAccounts(struct User u)
-{
+void checkAllAccounts(struct User u) {
     char userName[100];
     struct Record r;
 
@@ -144,10 +201,8 @@ void checkAllAccounts(struct User u)
 
     system("clear");
     printf("\t\t====== All accounts from user, %s =====\n\n", u.name);
-    while (getAccountFromFile(pf, userName, &r))
-    {
-        if (strcmp(userName, u.name) == 0)
-        {
+    while (getAccountFromFile(pf, userName, &r)) {
+        if (strcmp(userName, u.name) == 0) {
             printf("_____________________\n");
             printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
                    r.accountNbr,
