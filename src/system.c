@@ -18,20 +18,20 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
                   r->accountType) != EOF;
 }
 
-void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
+void saveAccountToFile(FILE *ptr, struct User *u, struct Record *r)
 {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
-            &r->id,
-	    &u->id
-	    &u->name,
-            r.accountNbr,
-            r.deposit.month,
-            r.deposit.day,
-            r.deposit.year,
-            r.country,
-            r.phone,
-            r.amount,
-            r.accountType);
+            r->id,
+	    u->id,
+	    u->name,
+            r->accountNbr,
+            r->deposit.month,
+            r->deposit.day,
+            r->deposit.year,
+            r->country,
+            r->phone,
+            r->amount,
+            r->accountType);
 }
 
 void stayOrReturn(int notGood, void f(struct User u), struct User u)
@@ -76,7 +76,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
 void success(struct User u)
 {
     int option;
-    printf("\n✔ Success!\n\n");
+    printf("\n✅ Success!\n\n");
 invalid:
     printf("Enter 1 to go to the main menu and 0 to exit!\n");
     scanf("%d", &option);
@@ -116,7 +116,7 @@ noAccount:
     {
         if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
         {
-            printf("✖ This Account already exists for this user\n\n");
+            printf("❌Error This Account already exists for this user\n\n");
             goto noAccount;
         }
     }
@@ -129,7 +129,7 @@ noAccount:
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
 
-    saveAccountToFile(pf, u, r);
+    saveAccountToFile(pf, &u, &r);
 
     fclose(pf);
     success(u);

@@ -8,3 +8,7 @@ _atm-management-system/src/main.c
 _atm-management-system/src/system.c
 .vscode/settings.json
 src/*.o
+data/*
+test.c
+test
+atm

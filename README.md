@@ -5,8 +5,8 @@ The objective of this project is to show that you have acquired programming logi
 The programming language you are about to use is C. You will not be asked to create a project from scratch, instead you will have to add features or fix the code of a given application.
 
 ##  Steps
-+   [ ] Login
-+   [ ] Register/Create a new account
++   [x] Login
++   [x] Register/Create a new account
 +   [ ] Check the details of existing accounts
 +   [ ] Update information of existing accounts
 +   [ ] Remove existing accounts
@@ -49,3 +49,4 @@ The following features must be implemented by yourself.
    6.2. Saving the information in the corresponding file
 
 ##  Source
+![File Permission](https://stackoverflow.com/questions/1466000/difference-between-modes-a-a-w-w-and-r-in-built-in-open-function)
