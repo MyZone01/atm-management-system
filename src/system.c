@@ -2,6 +2,11 @@
 
 const char *RECORDS = "./data/records.txt";
 
+void saveChanges() {
+    remove("./data/records.txt");
+    rename("./data/temp.txt", "./data/records.txt");
+}
+
 int getAccountFromFile(FILE *ptr, char name[50], struct Record *r) {
     return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
                   &r->id,
@@ -157,44 +162,36 @@ Again:
     success(u);
 }
 
-void RemoveAccount(struct User u) {
+void removeAccount(struct User u) {
     int AccNum;
-
-    printf("\n\nEnter the account number you want to delete: ");
-    scanf("%d", &AccNum);
-
-    FILE * f;
-    if ((f = fopen(RECORDS, "r+")) == NULL)  {
-        printf("❌ Error opening file");
-        exit(1);
-    }
-
+    FILE *f;
     struct Record r;
     char userName[100];
     int ok = 0;
 
-    FILE * new;
-    if ((new = fopen("./data/temp.txt", "w+")) == NULL)  {
+    if ((f = fopen(RECORDS, "r+")) == NULL) {
         printf("❌ Error opening file");
         exit(1);
     }
 
-    while(getAccountFromFile(f, userName, &r)) {
+    system("clear");
+    printf("\n\nEnter the account number to delete: ");
+    scanf("%d", &AccNum);
+
+    FILE *new;
+    if ((new = fopen("./data/temp.txt", "w+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    while (getAccountFromFile(f, userName, &r)) {
         if ((strcmp(userName, u.name) == 0) && AccNum == r.accountNbr) {
             ok = 1;
             system("clear");
             printf("_____________________\n");
-            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
-                   r.accountNbr,
-                   r.deposit.day,
-                   r.deposit.month,
-                   r.deposit.year,
-                   r.country,
-                   r.phone,
-                   r.amount,
-                   r.accountType);
+            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n", r.accountNbr, r.deposit.day, r.deposit.month, r.deposit.year, r.country, r.phone, r.amount, r.accountType);
         } else {
-             saveAccountToFile(new, &u, &r);
+            saveAccountToFile(new, &u, &r);
         }
     }
     if (ok == 0) {
@@ -202,10 +199,9 @@ void RemoveAccount(struct User u) {
         stayOrReturn(1, mainMenu, u);
     }
 
-    remove("./data/records.txt");
-    rename("./data/temp.txt", "./data/records.txt");
+    saveChanges();
 
-    fclose(f); 
+    fclose(f);
     fclose(new);
 
     success(u);
@@ -270,5 +266,81 @@ void checkAllAccounts(struct User u) {
         }
     }
     fclose(pf);
+    success(u);
+}
+
+void updateAccount(struct User u) {
+    struct Record newRecord;
+    char Country[100];
+
+    FILE *f;
+    struct Record r;
+    char userName[50];
+
+    if ((f = fopen(RECORDS, "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    system("clear");
+    printf("\n\nThe account number to update: ");
+    scanf("%d", &newRecord.accountNbr);
+    int ok = 0;
+    while (getAccountFromFile(f, userName, &r)) {
+        if (strcmp(userName, u.name) == 0 && newRecord.accountNbr == r.accountNbr) {
+            ok = 1;
+        }
+    }
+    if (ok == 0) {
+        printf("\n❌ Invalid Account Number");
+        stayOrReturn(1, mainMenu, u);
+    }
+
+    int field;
+    printf("\nEnter the field to update?\n [1] - phone number\n [2] - country\n");
+    scanf("%d", &field);
+
+    system("clear");
+
+    if (field == 1) {
+        printf("Enter the new phone number: ");
+        scanf("%d", &newRecord.phone);
+    } else if (field == 2) {
+        printf("Enter the new country: ");
+        scanf("%s", newRecord.country);
+    } else {
+        printf("Invalid operation!\n");
+        stayOrReturn(1, mainMenu, u);
+    }
+    FILE *new;
+    if ((new = fopen("./data/temp.txt", "w")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    struct Record r2;
+    userName[0] = '\0';
+
+    if ((f = fopen(RECORDS, "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    while (getAccountFromFile(f, userName, &r2)) {
+        if (strcmp(userName, u.name) == 0 && newRecord.accountNbr == r2.accountNbr) {
+            if (field == 1) {
+                r2.phone = newRecord.phone;
+            }
+            if (field == 2) {
+                strcpy(r2.country, newRecord.country);
+            }
+        }
+        saveAccountToFile(new, &u, &r2);
+    }
+
+    saveChanges();
+
+    fclose(f);
+    fclose(new);
     success(u);
 }

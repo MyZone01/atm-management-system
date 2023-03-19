@@ -20,8 +20,7 @@ void mainMenu(struct User u) {
             createNewAccount(u);
             break;
         case 2:
-            // student TODO : add your **Update account information** function
-            // here
+            updateAccount(u);
             break;
         case 3:
             CheckDetailsAccount(u);
@@ -34,7 +33,7 @@ void mainMenu(struct User u) {
             // here
             break;
         case 6:
-            RemoveAccount(u);
+            removeAccount(u);
             break;
         case 7:
             // student TODO : add your **Transfer owner** function
