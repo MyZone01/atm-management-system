@@ -1,8 +1,10 @@
 #include "header.h"
 
-void mainMenu(struct User u) {
+void mainMenu(struct User u, int doClear) {
     int option;
-    system("clear");
+    if (doClear == 1) {
+        system("clear");
+    }
     printf("\n\n\t\t======= ATM =======\n\n");
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
     printf("\n\t\t[1]- Create a new account\n");
@@ -29,8 +31,7 @@ void mainMenu(struct User u) {
             checkAllAccounts(u);
             break;
         case 5:
-            // student TODO : add your **Make transaction** function
-            // here
+            makeTransaction(u);
             break;
         case 6:
             removeAccount(u);
@@ -86,6 +87,6 @@ int main() {
     struct User u;
 
     initMenu(&u);
-    mainMenu(u);
+    mainMenu(u, 1);
     return 0;
 }

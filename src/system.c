@@ -37,7 +37,7 @@ void saveAccountToFile(FILE *ptr, struct User *u, struct Record *r) {
             r->accountType);
 }
 
-void stayOrReturn(int notGood, void f(struct User u), struct User u) {
+void stayOrReturn(int notGood, void f(struct User u, int doClear), struct User u) {
     int option;
     if (notGood == 0) {
         system("clear");
@@ -46,9 +46,9 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u) {
         printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
         scanf("%d", &option);
         if (option == 0)
-            f(u);
+            f(u, 1);
         else if (option == 1)
-            mainMenu(u);
+            mainMenu(u, 1);
         else if (option == 2)
             exit(0);
         else {
@@ -60,8 +60,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u) {
         scanf("%d", &option);
     }
     if (option == 1) {
-        system("clear");
-        mainMenu(u);
+        mainMenu(u, 1);
     } else {
         system("clear");
         exit(1);
@@ -76,7 +75,7 @@ invalid:
     scanf("%d", &option);
     system("clear");
     if (option == 1) {
-        mainMenu(u);
+        mainMenu(u, 1);
     } else if (option == 0) {
         exit(1);
     } else {
@@ -191,11 +190,16 @@ void removeAccount(struct User u) {
             printf("_____________________\n");
             printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n", r.accountNbr, r.deposit.day, r.deposit.month, r.deposit.year, r.country, r.phone, r.amount, r.accountType);
         } else {
-            saveAccountToFile(new, &u, &r);
+            struct User temp;
+            temp.id = r.userId;
+            strcpy(temp.name, userName);
+            saveAccountToFile(new, &temp, &r);
         }
     }
     if (ok == 0) {
-        printf("Invalid operation\n\n");
+        printf("\033[31m");
+        printf("\n❌ Invalid operation\n\n");
+        printf("\033[0m");
         stayOrReturn(1, mainMenu, u);
     }
 
@@ -292,12 +296,14 @@ void updateAccount(struct User u) {
         }
     }
     if (ok == 0) {
-        printf("\n❌ Invalid Account Number");
+        printf("\033[31m");
+        printf("\n❌ Invalid operation\n\n");
+        printf("\033[0m");
         stayOrReturn(1, mainMenu, u);
     }
 
     int field;
-    printf("\nEnter the field to update?\n [1] - phone number\n [2] - country\n");
+    printf("\nEnter the field to update?\n\t[1] - phone number\n\t[2] - country\n");
     scanf("%d", &field);
 
     system("clear");
@@ -309,7 +315,9 @@ void updateAccount(struct User u) {
         printf("Enter the new country: ");
         scanf("%s", newRecord.country);
     } else {
-        printf("Invalid operation!\n");
+        printf("\033[31m");
+        printf("\n❌ Invalid operation\n\n");
+        printf("\033[0m");
         stayOrReturn(1, mainMenu, u);
     }
     FILE *new;
@@ -327,6 +335,7 @@ void updateAccount(struct User u) {
     }
 
     while (getAccountFromFile(f, userName, &r2)) {
+        struct User temp;
         if (strcmp(userName, u.name) == 0 && newRecord.accountNbr == r2.accountNbr) {
             if (field == 1) {
                 r2.phone = newRecord.phone;
@@ -335,12 +344,119 @@ void updateAccount(struct User u) {
                 strcpy(r2.country, newRecord.country);
             }
         }
-        saveAccountToFile(new, &u, &r2);
+        temp.id = r2.userId;
+        strcpy(temp.name, userName);
+        saveAccountToFile(new, &temp, &r2);
     }
 
     saveChanges();
 
     fclose(f);
     fclose(new);
+    success(u);
+}
+
+void makeTransaction(struct User u) {
+    int AccNum;
+    FILE *f;
+    struct Record r;
+    char userName[100];
+
+    if ((f = fopen(RECORDS, "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    system("clear");
+    printf("\nEnter the account number: ");
+    scanf("%d", &AccNum);
+    int ok = 0;
+    while (getAccountFromFile(f, userName, &r)) {
+        if ((strcmp(userName, u.name) == 0) && AccNum == r.accountNbr) {
+            ok = 1;
+            break;
+        }
+    }
+    if (r.accountType[0] == 'f') {
+        system("clear");
+        printf("\033[31m");
+        printf("❌ You cannot deposit or withdraw cash in fixed accounts\n");
+        printf("\033[0m");
+        mainMenu(u, 0);
+        return;
+    }
+    if (ok == 0) {
+        printf("\033[31m");
+        printf("\n❌ Invalid operation\n\n");
+        printf("\033[0m");
+        stayOrReturn(1, mainMenu, u);
+    }
+
+    int Num;
+    printf("\n\nDo you want to:\n\t[1] - Withdraw\n\t[2] - Deposit\n\nEnter your choice: ");
+    scanf("%d", &Num);
+
+    if ((Num != 1) && (Num != 2)) {
+        printf("\033[31m");
+        printf("\n❌ Invalid operation\n\n");
+        printf("\033[0m");
+        stayOrReturn(1, mainMenu, u);
+    }
+
+    double amount;
+    if (Num == 1) {
+        printf("Enter the amount you want to withdraw: $");
+    } else {
+        printf("Enter the amount you want to depose: $");
+    }
+    scanf("%lf", &amount);
+
+    FILE *f2;
+    struct Record r2;
+    userName[0] = '\0';
+
+    if ((f2 = fopen(RECORDS, "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    FILE *new;
+    if ((new = fopen("./data/temp.txt", "w+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    ok = 0;
+    while (getAccountFromFile(f2, userName, &r2)) {
+        if ((strcmp(userName, u.name) == 0) && AccNum == r2.accountNbr) {
+            if (Num == 1) {
+                if (amount > r2.amount) {
+                    system("clear");
+                    printf("\033[31m");
+                    printf("❌ The amount you chose to withdraw is superior to your available balance!\n");
+                    printf("\033[0m");
+                    mainMenu(u, 0);
+                    return;
+                } else {
+                    r2.amount -= amount;
+                    ok++;
+                }
+            } else if (Num == 2) {
+                r2.amount += amount;
+                ok++;
+            }
+        }
+        struct User temp;
+        temp.id = r2.userId;
+        strcpy(temp.name, userName);
+        saveAccountToFile(new, &temp, &r2);
+    }
+    if (ok > 0) {
+        saveChanges();
+    }
+
+    fclose(f2);
+    fclose(new);
+
     success(u);
 }
