@@ -2,6 +2,10 @@
 
 const char *RECORDS = "./data/records.txt";
 
+int getUsersFromFile(FILE *ptr, char name[50], struct User *u) {
+    return fscanf(ptr, "%s %s,", name, u->password) != EOF;
+}
+
 void saveChanges() {
     remove("./data/records.txt");
     rename("./data/temp.txt", "./data/records.txt");
@@ -458,5 +462,74 @@ void makeTransaction(struct User u) {
     fclose(f2);
     fclose(new);
 
+    success(u);
+}
+
+void transferAccount(struct User u) {
+    int AccNum;
+    FILE *f, *f2;
+    struct Record r;
+    char userName[100];
+    int ok = 0, ok2 = 0;
+    char nickName[100];
+    struct User u2;
+
+    if ((f = fopen(RECORDS, "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    system("clear");
+    printf("\n\nEnter the account number you want to transfer ownership: ");
+    scanf("%d", &AccNum);
+
+    printf("\nWhich user you want transfer ownership to (user name): ");
+    scanf("%s", nickName);
+
+    FILE *new;
+    if ((new = fopen("./data/temp.txt", "w+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+
+    if ((f2 = fopen("./data/users.txt", "r+")) == NULL) {
+        printf("❌ Error opening file");
+        exit(1);
+    }
+    while (getUsersFromFile(f2, userName, &u2)) {
+        if (strcmp(userName, nickName) == 0) {
+            ok2++;
+        }
+    }
+    userName[0] = '\0';
+    while (getAccountFromFile(f, userName, &r)) {
+        struct User temp;
+        if ((strcmp(userName, u.name) == 0) && AccNum == r.accountNbr) {
+            ok = 1;
+            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+                   r.accountNbr,
+                   r.deposit.day,
+                   r.deposit.month,
+                   r.deposit.year,
+                   r.country,
+                   r.phone,
+                   r.amount,
+                   r.accountType);
+            strcpy(userName, nickName);
+        }
+        temp.id = r.userId;
+        strcpy(temp.name, userName);
+        saveAccountToFile(new, &temp, &r);
+    }
+    if (ok == 0 || ok2 == 0) {
+        printf("\033[31m");
+        printf("\n❌ Invalid operation\n\n");
+        printf("\033[0m");
+        stayOrReturn(1, mainMenu, u);
+    } else {
+        saveChanges();
+    }
+    fclose(f);
+    fclose(new);
     success(u);
 }

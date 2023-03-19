@@ -39,3 +39,4 @@ void CheckDetailsAccount(struct User u);
 void removeAccount(struct User u);
 void updateAccount(struct User u);
 void makeTransaction(struct User u);
+void transferAccount(struct User u);

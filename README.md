@@ -13,7 +13,7 @@ The programming language you are about to use is C. You will not be asked to cre
 +   [x] Update information of existing accounts
 +   [x] Check list of owned accounts
 +   [x] Make transactions
-+   [ ] Transfer Ownership
++   [x] Transfer Ownership
    +   [ ] Notify user
 
 ### Features
