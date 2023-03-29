@@ -531,5 +531,8 @@ void transferAccount(struct User u) {
     }
     fclose(f);
     fclose(new);
+
+    notifyUser(u);
+
     success(u);
 }

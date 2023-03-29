@@ -1,10 +1,14 @@
 #include "header.h"
+#include <pthread.h>
 
 void mainMenu(struct User u, int doClear) {
     int option;
     if (doClear == 1) {
         system("clear");
     }
+    pthread_t t;
+    pthread_create(&t, NULL, handleNotification, (void *)&t);
+
     printf("\n\n\t\t======= ATM =======\n\n");
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
     printf("\n\t\t[1]- Create a new account\n");

@@ -40,3 +40,7 @@ void removeAccount(struct User u);
 void updateAccount(struct User u);
 void makeTransaction(struct User u);
 void transferAccount(struct User u);
+
+// socket function
+void notifyUser(struct User u);
+void handleNotification(void * t);
