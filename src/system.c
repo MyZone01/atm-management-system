@@ -3,7 +3,7 @@
 const char *RECORDS = "./data/records.txt";
 
 int getUsersFromFile(FILE *ptr, char name[50], struct User *u) {
-    return fscanf(ptr, "%s %s,", name, u->password) != EOF;
+    return fscanf(ptr, "%d %s %s,", &u->id, name, u->password) != EOF;
 }
 
 void saveChanges() {
@@ -474,7 +474,7 @@ void transferAccount(struct User u) {
     struct Record r;
     char userName[100];
     int ok = 0, ok2 = 0;
-    char nickName[100];
+    char uName[100];
     struct User u2;
 
     if ((f = fopen(RECORDS, "r+")) == NULL) {
@@ -487,7 +487,7 @@ void transferAccount(struct User u) {
     scanf("%d", &AccNum);
 
     printf("\nWhich user you want transfer ownership to (user name): ");
-    scanf("%s", nickName);
+    scanf("%s", uName);
 
     FILE *new;
     if ((new = fopen("./data/temp.txt", "w+")) == NULL) {
@@ -500,8 +500,9 @@ void transferAccount(struct User u) {
         exit(1);
     }
     while (getUsersFromFile(f2, userName, &u2)) {
-        if (strcmp(userName, nickName) == 0) {
+        if (strcmp(userName, uName) == 0) {
             ok2++;
+            break;
         }
     }
     userName[0] = '\0';
@@ -518,9 +519,12 @@ void transferAccount(struct User u) {
                    r.phone,
                    r.amount,
                    r.accountType);
-            strcpy(userName, nickName);
+            strcpy(userName, uName);
+            temp.id = u2.id;
+        } else {
+            temp.id = r.userId;
         }
-        temp.id = r.userId;
+
         strcpy(temp.name, userName);
         saveAccountToFile(new, r.id, &temp, &r);
     }
