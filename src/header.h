@@ -28,8 +28,8 @@ struct User {
 
 // authentication functions
 void loginMenu(char a[50], char pass[50]);
-void registerMenu(char a[50], char pass[50]);
-const char *getPassword(struct User u);
+void registerMenu(int* id,char a[50], char pass[50]);
+const char *getPassword(int* id, struct User u);
 
 // system function
 void createNewAccount(struct User u);
@@ -42,5 +42,5 @@ void makeTransaction(struct User u);
 void transferAccount(struct User u);
 
 // socket function
-void notifyUser(struct User u);
-void handleNotification(void * t);
+// void notifyUser(struct User u);
+// void handleNotification(void * t);

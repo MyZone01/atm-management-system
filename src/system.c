@@ -26,9 +26,9 @@ int getAccountFromFile(FILE *ptr, char name[50], struct Record *r) {
                   r->accountType) != EOF;
 }
 
-void saveAccountToFile(FILE *ptr, struct User *u, struct Record *r) {
+void saveAccountToFile(FILE *ptr, int id, struct User *u, struct Record *r) {
     fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
-            r->id,
+            id,
             u->id,
             u->name,
             r->accountNbr,
@@ -197,7 +197,7 @@ void removeAccount(struct User u) {
             struct User temp;
             temp.id = r.userId;
             strcpy(temp.name, userName);
-            saveAccountToFile(new, &temp, &r);
+            saveAccountToFile(new, r.id, &temp, &r);
         }
     }
     if (ok == 0) {
@@ -217,12 +217,13 @@ void removeAccount(struct User u) {
 
 void createNewAccount(struct User u) {
     struct Record r;
-    struct Record cr;
+    struct Record temp;
     char userName[50];
+    int lastId;
     FILE *pf = fopen(RECORDS, "a+");
 
-noAccount:
     system("clear");
+noAccount:
     printf("\t\t\t===== New record =====\n");
 
     printf("\nEnter today's date(mm/dd/yyyy):");
@@ -230,9 +231,11 @@ noAccount:
     printf("\nEnter the account number:");
     scanf("%d", &r.accountNbr);
 
-    while (getAccountFromFile(pf, userName, &cr)) {
-        if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr) {
+    while (getAccountFromFile(pf, userName, &temp)) {
+        if (strcmp(userName, u.name) == 0 && temp.accountNbr == r.accountNbr) {
+            system("clear");
             printf("❌Error This Account already exists for this user\n\n");
+            fseek(pf, 0L, SEEK_SET);
             goto noAccount;
         }
     }
@@ -245,7 +248,7 @@ noAccount:
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
 
-    saveAccountToFile(pf, &u, &r);
+    saveAccountToFile(pf, temp.id + 1, &u, &r);
 
     fclose(pf);
     success(u);
@@ -350,7 +353,7 @@ void updateAccount(struct User u) {
         }
         temp.id = r2.userId;
         strcpy(temp.name, userName);
-        saveAccountToFile(new, &temp, &r2);
+        saveAccountToFile(new, r2.id, &temp, &r2);
     }
 
     saveChanges();
@@ -453,7 +456,7 @@ void makeTransaction(struct User u) {
         struct User temp;
         temp.id = r2.userId;
         strcpy(temp.name, userName);
-        saveAccountToFile(new, &temp, &r2);
+        saveAccountToFile(new, r2.id, &temp, &r2);
     }
     if (ok > 0) {
         saveChanges();
@@ -519,7 +522,7 @@ void transferAccount(struct User u) {
         }
         temp.id = r.userId;
         strcpy(temp.name, userName);
-        saveAccountToFile(new, &temp, &r);
+        saveAccountToFile(new, r.id, &temp, &r);
     }
     if (ok == 0 || ok2 == 0) {
         printf("\033[31m");
@@ -532,7 +535,7 @@ void transferAccount(struct User u) {
     fclose(f);
     fclose(new);
 
-    notifyUser(u);
+    // notifyUser(u);
 
     success(u);
 }

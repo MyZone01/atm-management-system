@@ -1,13 +1,14 @@
-#include "header.h"
 #include <pthread.h>
+
+#include "header.h"
 
 void mainMenu(struct User u, int doClear) {
     int option;
     if (doClear == 1) {
         system("clear");
     }
-    pthread_t t;
-    pthread_create(&t, NULL, handleNotification, (void *)&t);
+    // pthread_t t;
+    // pthread_create(&t, NULL, handleNotification, (void *)&t);
 
     printf("\n\n\t\t======= ATM =======\n\n");
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
@@ -65,7 +66,7 @@ void initMenu(struct User *u) {
         switch (option) {
             case 1:
                 loginMenu(u->name, u->password);
-                if (strcmp(u->password, getPassword(*u)) == 0) {
+                if (strcmp(u->password, getPassword(&u->id, *u)) == 0) {
                     printf("\n\nPassword Match!");
                 } else {
                     printf("\nWrong password!! or User Name\n");
@@ -74,7 +75,7 @@ void initMenu(struct User *u) {
                 r = 1;
                 break;
             case 2:
-                registerMenu(u->name, u->password);
+                registerMenu(&u->id, u->name, u->password);
                 r = 1;
                 break;
             case 3:

@@ -30,7 +30,7 @@ void loginMenu(char a[50], char pass[50]) {
     }
 };
 
-const char *getPassword(struct User u) {
+const char *getPassword(int* id, struct User u) {
     FILE *fp;
     struct User userChecker;
 
@@ -43,6 +43,7 @@ const char *getPassword(struct User u) {
         if (strcmp(userChecker.name, u.name) == 0) {
             fclose(fp);
             char *buff = userChecker.password;
+            *id = userChecker.id;
             return buff;
         }
     }
@@ -51,7 +52,7 @@ const char *getPassword(struct User u) {
     return "no user found";
 }
 
-void registerMenu(char a[50], char pass[50]) {
+void registerMenu(int* id, char a[50], char pass[50]) {
     struct termios oflags, nflags;
     int lastId;
     char password[50];
@@ -88,8 +89,6 @@ void registerMenu(char a[50], char pass[50]) {
     char userName[100];
 
     while (fscanf(file, "%d %s %s", &lastId, userName, password) != EOF) {
-        printf("%d", lastId);
-        printf("%s", userName);
         if (strcmp(userName, a) == 0) {
             printf("❌ Error nickname already exists\n");
             return exit(1);
@@ -97,6 +96,7 @@ void registerMenu(char a[50], char pass[50]) {
     }
 
     lastId++;
+    *id = lastId;
 
     fprintf(file, "%d %s %s\n", lastId, a, pass);
     fclose(file);
