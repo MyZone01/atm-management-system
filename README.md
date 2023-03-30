@@ -1,4 +1,4 @@
-#   ATM MANAGEMENT SYSTEM
+#   💸 ATM MANAGEMENT SYSTEM
 ##  Description
 The objective of this project is to show that you have acquired programming logic and that you are able to adapt to new languages.
 
@@ -15,6 +15,7 @@ The programming language you are about to use is C. You will not be asked to cre
 +   [x] Make transactions
 +   [x] Transfer Ownership
    +   [ ] Notify user
+   +   [ ] Use SQLite
 
 ### Features
 The following features must be implemented by yourself.
